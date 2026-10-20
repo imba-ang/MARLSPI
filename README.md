@@ -1,6 +1,6 @@
-# MARLSPI
+# MARL_SPI
 
-MARLSPI is a Python/PyTorch library of multi-agent reinforcement learning components for autonomous vehicle control in a three-lane road-merging setting. It combines independent learners with optional driving priors, feasibility masks, distance-based risk weighting, and context-conditioned network initialization.
+MARL_SPI is a Python/PyTorch library of multi-agent reinforcement learning components for autonomous vehicle control in a three-lane road-merging setting. It combines independent learners with optional driving priors, feasibility masks, distance-based risk weighting, and context-conditioned network initialization.
 
 The repository contains the learning and control building blocks. To run traffic experiments, supply a simulator, observation adapter, training loop, and prior data. A simulator integration, command-line training script, datasets, and pretrained checkpoints.
 
