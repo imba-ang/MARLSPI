@@ -81,11 +81,11 @@ agent.observe(
 print(agent.update())
 ```
 
-Use `algorithm="ia2c"` for IA2C, which requires `update_epochs=1`. Both learners return loss and KL metrics and clear their rollout buffer after updating. For evaluation, use `agent.act(..., deterministic=True)`; deterministic decisions cannot be added to an on-policy rollout.
+Use `algorithm="ia2c"` for IA2C, which requires `update_epochs=1`. Both learners return loss and KL metrics and clear their rollout buffer after updating. For evaluation, use `agent.act(..., deterministic=True)`. 
 
 IPPO and IA2C learn from freshly collected on-policy rollouts. IPPO supports multiple clipped-objective update epochs; IA2C performs one actor-critic update epoch. Choose IDQN when your experiment calls for Q-learning with replay.
 
-IDQN is available through `create_q_agent()`. Its `observe()` method takes `next_feasible` and `terminated`, without a `truncated` argument. Collect at least `PAPER.batch_size` transitions (128 by default) before calling its `update()`, which samples from replay. Without a prior, IDQN uses epsilon-greedy selection; with a prior, it samples a masked distribution over temperature-scaled Q-values.
+IDQN is available through `create_q_agent()`. Its `observe()` method takes `next_feasible` and `terminated`, without a `truncated` argument. Collect at least `PAPER.batch_size` transitions (128 by default) before calling its `update()`, which samples from replay. Without a prior, IDQN uses epsilon-greedy selection. With a prior, it samples a masked distribution over temperature-scaled Q-values.
 
 ## Observations and actions
 
@@ -106,8 +106,6 @@ SV, FV, NLV, NPV, RLV, RPV
 
 Unavailable neighbors and neighbors beyond the default perception range contribute three zeros. Features are returned without normalization. `StateAbstraction` uses `Role.SV` as the leader.
 
-The source does not document physical assignments for the other role identifiers or enforce distance and relative-speed sign conventions. Define those consistently in your simulator adapter. For the leader, abstraction subtracts vehicle length from distance; in the IDM helper, a positive relative-speed input increases the desired gap.
-
 All action masks, priors, and risk vectors use the following order:
 
 | Index | Action | Default command |
@@ -120,7 +118,7 @@ All action masks, priors, and risk vectors use the following order:
 
 Lane changes use zero nominal acceleration by default. `execute_action()` returns a `Command(acceleration, target_lane)`; the simulator must implement the target-lane maneuver.
 
-`feasible_actions()` encodes the repository's road layout: lane 1 can merge left when permitted, lane 2 can move left, and lane 3 can move right. The caller supplies lane-availability flags. Longitudinal actions remain feasible in this helper; additional environment-specific constraints belong in the supplied mask.
+`feasible_actions()` encodes the repository's road layout: lane 1 can merge left when permitted, lane 2 can move left, and lane 3 can move right. The caller supplies lane-availability flags. 
 
 Agent `act()` methods accept masks convertible to a five-element Boolean tensor. At least one action must be feasible.
 
@@ -168,7 +166,7 @@ Create a local agent for each independently controlled vehicle. At each decision
 
 For IPPO/IA2C, distinguish terminal states (`terminated=True`) from time-limit cutoffs (`truncated=True`). The advantage calculation bootstraps at truncations but stops advantage propagation across episode boundaries. Collect sampled actions for training.
 
-The dynamics and reward modules provide individual calculations; the environment owns collision detection, lane-change steering, resets, episode boundaries, and multi-vehicle coordination.
+The dynamics and reward modules provide individual calculations. The environment owns collision detection, lane-change steering, resets, episode boundaries, and multi-vehicle coordination.
 
 For context-conditioned agents, pass a `ContextualInitializer` via `initializer=`, along with `initial_observation`, `role`, and `phase`. Default role and phase inputs have lengths 4 and 2; the role vector is separate from the six-slot neighbor `Role` enum. Agent factories copy and freeze the context encoder. Training the initializer and assigning meanings to these context inputs are tasks for the surrounding experiment.
 
